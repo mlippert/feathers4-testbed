@@ -4,14 +4,18 @@
 // for more of what you can do here.
 import { Application } from '../declarations';
 
-export default function (app: Application) {
+function createModel(app: Application) {
     const modelName = 'roomKv';
     const mongooseClient = app.get('mongooseClient');
     const { Schema } = mongooseClient;
     const schema = new Schema({
-        text: { type: String, required: true }
+        /** this is the room name */
+        _id: { type: String, required: true },
+
+        /** map of key value pairs for this room */
+        keyValues: { type: Map, of: String, default: new Map() },
     }, {
-        timestamps: true
+        timestamps: true,
     });
 
     // This is necessary to avoid model compilation errors in watch mode
@@ -21,3 +25,8 @@ export default function (app: Application) {
     }
     return mongooseClient.model(modelName, schema);
 }
+
+export default createModel;
+export {
+    createModel,
+};
