@@ -3,11 +3,26 @@ root = true
 
 [*]
 indent_style = space
-indent_size = 2
+indent_size = 4
 end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
+# trailing whitespace is significant to markdown
 [*.md]
 trim_trailing_whitespace = false
+
+[*.yml]
+indent_style = space
+indent_size = 2
+
+# npm writes package.json w/ an indent size of 2, so don't fight it
+# and do the same w/ other configuration files
+[{*.json,jest.config.js}]
+indent_style = space
+indent_size = 2
+
+[Makefile]
+indent_style = tab
+indent_size = 4
