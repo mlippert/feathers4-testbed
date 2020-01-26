@@ -1,7 +1,18 @@
+import { HookContext } from '@feathersjs/feathers';
 import * as authentication from '@feathersjs/authentication';
 // Don't remove this comment. It's needed to format import lines nicely.
 
 const { authenticate } = authentication.hooks;
+
+async function mergeKeyValues(context: HookContext): Promise<undefined> {
+    if (context.id === null || context.id === undefined) {
+        return;
+    }
+
+    const curRoomKV = await context.service.get(context.id);
+    const mergedKeyValues = new Map([...Object.entries(curRoomKV.keyValues), ...context.data.keyValues.entries()]);
+    context.data.keyValues = mergedKeyValues;
+}
 
 export default {
     before: {
@@ -10,7 +21,7 @@ export default {
         get: [],
         create: [],
         update: [],
-        patch: [],
+        patch: [ mergeKeyValues ],
         remove: []
     },
 
