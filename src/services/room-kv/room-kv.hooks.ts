@@ -2,10 +2,15 @@ import { HookContext } from '@feathersjs/feathers';
 import * as authentication from '@feathersjs/authentication';
 // Don't remove this comment. It's needed to format import lines nicely.
 
+// TODO Move this to some utils file for import!
+function isDefined<T>(value: T | undefined | null): value is T {
+  return <T>value !== undefined && <T>value !== null;
+}
+
 const { authenticate } = authentication.hooks;
 
 async function mergeKeyValues(context: HookContext): Promise<undefined> {
-    if (context.id === null || context.id === undefined) {
+    if (!isDefined(context.id) || !isDefined(context.data.keyValues)) {
         return;
     }
 
