@@ -110,9 +110,46 @@ describe('\'roomKV\' service', () => {
         });
 
         it('will coerce a numeric value to a string', async () => {
+            const kvs = [
+                [ 'new-value', 42 ],
+                [ '2nd-new-value', 100.22 ],
+            ]
+            const { _id, keyValues } = await app.service('room-kv').patch(roomName, {
+                keyValues: new Map(kvs),
+            }, {})
+
+            expect(_id).toBe(roomName)
+            // I'd expect keyValues to be a Map but it seems it's an Object
+            expect(keyValues).toBeInstanceOf(Object)
+            const patchedKeyValues = Object.entries(keyValues)
+            expect(patchedKeyValues.length).toBe(kvs.length)
+            for (const [ k, v ] of kvs) {
+                expect(keyValues[k]).toBe(v.toString())
+            }
         });
 
         it('can modify the value of an existing key', async () => {
+            const kvs = [
+                [ 'value1', '42' ],
+                [ 'value2', 'yada yada' ],
+            ]
+            await app.service('room-kv').patch(roomName, {
+                keyValues: new Map(kvs),
+            }, {})
+
+            const modifiedKvs = [
+                [ 'value2', 'quick brown fox' ],
+            ]
+            const { _id, keyValues } = await app.service('room-kv').patch(roomName, {
+                keyValues: new Map(modifiedKvs),
+            }, {})
+
+            expect(_id).toBe(roomName)
+            const patchedKeyValues = Object.entries(keyValues)
+            expect(patchedKeyValues.length).toBe(kvs.length) // number of keys is unchanged
+            expect(keyValues['value2']).not.toBe(kvs[1][1]) // modified key does not equal original value
+            expect(keyValues['value2']).toBe(modifiedKvs[0][1]) // modified key equals new value
+            expect(keyValues['value1']).toBe(kvs[0][1]) // unchanged key equals original value
         });
     });
 });
